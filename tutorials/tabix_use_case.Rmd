@@ -16,6 +16,7 @@ library("readr")
 library("coloc")
 library("GenomicRanges")
 library("seqminer")
+library("gwasvcf")
 ```
 
 We also need the paths to individual tabix-indexed summary-statistics files. These can be obtained from eQTL Catalogue resources GitHub repository:
@@ -83,10 +84,16 @@ Most GWAS summary statistics still use GRCh37 coordinates, so we first look up t
 ```{r, message=FALSE}
 # First, download the VCF file with 'wget https://gwas.mrcieu.ac.uk/files/ebi-a-GCST004599/ebi-a-GCST004599.vcf.gz'
 #and its tabix index with 'wget https://gwas.mrcieu.ac.uk/files/ebi-a-GCST004599/ebi-a-GCST004599.vcf.gz.tbi'
-gwas_stats = gwasvcf::query_gwas("tabix_data/ebi-a-GCST004599.vcf.gz", chrompos = "3:56649749-57049749")
+download.file(url="https://gwas.mrcieu.ac.uk/files/ebi-a-GCST004599/ebi-a-GCST004599.vcf.gz",quiet = FALSE, mode = "w",cacheOK = TRUE)
+download.file(url="https://gwas.mrcieu.ac.uk/files/ebi-a-GCST004599/ebi-a-GCST004599.vcf.gz.tbi",quiet = FALSE, mode = "w",cacheOK = TRUE)
+gwas_stats = gwasvcf::query_gwas("../tabix_data/ebi-a-GCST004599.vcf.gz", chrompos = "3:56649749-57049749")
 gwas_stats = gwasvcf::vcf_to_granges(gwas_stats) %>% 
   keepSeqlevels("3") %>% 
   renameSeqlevels("chr3")
+
+
+
+
 ```
 
 Next, we can use the liftOver command from the rtracklayer package to convert the chromosome coordinates from GRCh37 to GRCh38.
